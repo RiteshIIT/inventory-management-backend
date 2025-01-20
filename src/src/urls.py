@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from login.views import LoginApi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', LoginApi.as_view(), name='login'),
     path('api/', include('first.urls')),  # Include the first app's URLs
 ]
