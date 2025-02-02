@@ -23,4 +23,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
-"harshith's urls of signup"
+"harshith's urls signup"
