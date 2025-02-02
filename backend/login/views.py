@@ -23,4 +23,3 @@ class LoginApi(APIView):
             "user_id": user.id,
             "username": user.username
         })
-    """adfadfad"""
