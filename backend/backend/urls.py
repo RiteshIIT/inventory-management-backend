@@ -22,3 +22,5 @@ urlpatterns = [
     path('login/', LoginApi.as_view(), name='login'),
     path('admin/', admin.site.urls),
 ]
+
+"harshith's urls of signup"
