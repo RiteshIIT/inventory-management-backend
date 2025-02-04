@@ -26,3 +26,59 @@ class LoginApi(APIView):
         
         
 "harshith signup"
+from django.db import models
+from rest_framework import fields, viewsets, serializers
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from django.contrib.auth.models import User
+
+MIN_LENGTH = 8
+
+class UserSerializer(serializers.ModelSerializer):
+    
+    password = serializers.CharField(
+        write_only=True,
+        min_length=MIN_LENGTH,
+        error_messages={
+            "min_length": f"Password must be longer than {MIN_LENGTH} characters."
+        }
+    )
+    password2 = serializers.CharField(
+        write_only=True,
+        min_length=MIN_LENGTH,
+        error_messages={
+            "min_length": f"Password must be longer than {MIN_LENGTH} characters."
+        }
+    )
+
+    class Meta:
+        model = User
+        fields = "__all__"
+    
+    def validate(self, data):
+        if data["password"] != data["password2"]:
+            raise serializers.ValidationError("Passwords do not match.")
+        return data
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data["email"]
+        )
+        
+        user.set_password(validated_data["password"])
+        user.save()
+        
+        return user
+ 
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class SignupView(APIView):  # Corrected class name and base class
+    def post(self, request, *args, **kwargs):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
