@@ -6,4 +6,4 @@ class Inventory(models.Model):
     description = models.TextField()
     code=models.CharField(max_length=3)
     quantity=models.IntegerField()
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
