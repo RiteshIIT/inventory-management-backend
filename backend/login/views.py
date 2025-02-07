@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from . models import Inventory
 
 class LoginApi(APIView):
     def post(self, request):
@@ -25,7 +28,7 @@ class LoginApi(APIView):
         })
         
         
-"harshith signup"
+#"harshith signup"
 from django.db import models
 from rest_framework import fields, viewsets, serializers
 from rest_framework.response import Response
@@ -70,7 +73,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         
         return user
- 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -82,3 +85,19 @@ class SignupView(APIView):  # Corrected class name and base class
             serializer.save()
             return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class InventorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inventory
+        fields = ['name', 'description', 'code', 'quantity']
+
+class InventoryPage(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+        
+    def get(self, request):
+        user=request.user
+        Table = Inventory.objects.filter(owner=user)
+
+        serializer = InventorySerializer(Table, many=True)
+        return Response(serializer.data)
