@@ -47,5 +47,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('first.urls')),  # Include the first app's URL s 
+    path('api/', include('login.urls')),  # Include the first app's URL s 
 ]
