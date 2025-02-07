@@ -28,7 +28,7 @@ class LoginApi(APIView):
         })
         
         
-"harshith signup"
+#"harshith signup"
 from django.db import models
 from rest_framework import fields, viewsets, serializers
 from rest_framework.response import Response

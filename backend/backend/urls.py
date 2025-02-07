@@ -25,7 +25,7 @@ urlpatterns = [
     path('inventory/', InventoryPage.as_view(), name='inventory')
 ]
 
-"harshith's urls signup"
+#"harshith's urls signup
 """
 URL configuration for src project.
 
