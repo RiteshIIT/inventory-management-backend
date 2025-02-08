@@ -146,17 +146,42 @@ class ProductDetail(APIView):
 
     def put(self, request, pk):
         user = request.user
+        data = request.data
+
+        
         try:
-            product = Inventory.objects.get(pk=pk, owner=user)
+            product = Inventory.objects.get(pk=pk, owner=user)  
         except Inventory.DoesNotExist:
             return Response({"error": "Product not found."}, status=404)
-        serializer = InventorySerializer(product, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+
+        
+        provided_code = data.get("code")
+        if not provided_code or product.code != provided_code:
+            return Response({"error": "Incorrect or missing product code."}, status=400)
+
+        
+        updated_fields = []
+        if "name" in data:
+            product.name = data["name"]
+            updated_fields.append("name")
+        if "description" in data:
+            product.description = data["description"]
+            updated_fields.append("description")
+        if "quantity" in data:
+            product.quantity = data["quantity"]
+            updated_fields.append("quantity")
+
+        if not updated_fields:
+            return Response({"error": "No valid fields to update."}, status=400)
+
+        product.save()
+
+        return Response({"message": "Product updated successfully!", "updated_fields": updated_fields}, status=200)
+
 
     def delete(self, request, pk):
+        data = request.data
+        data["owner"] = user.id
         user = request.user
         try:
             product = Inventory.objects.get(pk=pk, owner=user)
