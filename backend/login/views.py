@@ -101,3 +101,85 @@ class InventoryPage(APIView):
 
         serializer = InventorySerializer(Table, many=True)
         return Response(serializer.data)
+
+class NewProduct(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        data = request.data
+        data["owner"] = user.id
+        serializer = InventorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class ProductDetail(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        user = request.user
+        try:
+            product = Inventory.objects.get(pk=pk, owner=user)
+        except Inventory.DoesNotExist:
+            return Response({"error": "Product not found."}, status=404)
+        serializer = InventorySerializer(product)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        user = request.user
+        try:
+            product = Inventory.objects.get(pk=pk, owner=user)
+        except Inventory.DoesNotExist:
+            return Response({"error": "Product not found."}, status=404)
+        serializer = InventorySerializer(product, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    def delete(self, request, pk):
+        user = request.user
+        try:
+            product = Inventory.objects.get(pk=pk, owner=user)
+        except Inventory.DoesNotExist:
+            return Response({"error": "Product not found."}, status=404)
+        product.delete()
+        return Response(status=204)
+    
+class ProductList(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        products = Inventory.objects.filter(owner=user)
+        serializer = InventorySerializer(products, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        user = request.user
+        data = request.data
+        data["owner"] = user.id
+        serializer = InventorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+class AddPhoto(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, pk):
+        user = request.user
+        try:
+            product = Inventory.objects.get(pk=pk, owner=user)
+        except Inventory.DoesNotExist:
+            return Response({"error": "Product not found."}, status=404)
+        product.photo = request.data["photo"]
+        product.save()
+        return Response({"message": "Photo added successfully."})
