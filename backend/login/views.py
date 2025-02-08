@@ -104,7 +104,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
-        fields = ['name', 'description', 'code', 'quantity']
+        fields = '__all__'
 
 class InventoryPage(APIView):
     authentication_classes = [TokenAuthentication]
