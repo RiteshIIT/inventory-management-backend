@@ -6,8 +6,12 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import Inventory
+from rest_framework.permissions import AllowAny
+
 
 class LoginApi(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny] 
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -75,6 +79,8 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class UserViewSet(viewsets.ModelViewSet):
+    authentication_classes = [] 
+    permission_classes = [AllowAny] 
     queryset = User.objects.all()
     serializer_class = UserSerializer
     def delete(self, request, user_id, *args, **kwargs):
