@@ -43,39 +43,34 @@ from django.contrib.auth.models import User
 MIN_LENGTH = 8
 
 class UserSerializer(serializers.ModelSerializer):
-    
     password = serializers.CharField(
         write_only=True,
-        min_length=MIN_LENGTH,
-        error_messages={
-            "min_length": f"Password must be longer than {MIN_LENGTH} characters."
-        }
+        min_length=8,
+        error_messages={"min_length": "Password must be at least 8 characters long."}
     )
     password2 = serializers.CharField(
         write_only=True,
-        min_length=MIN_LENGTH,
-        error_messages={
-            "min_length": f"Password must be longer than {MIN_LENGTH} characters."
-        }
+        min_length=8,
+        error_messages={"min_length": "Password must be at least 8 characters long."}
     )
 
     class Meta:
         model = User
-        fields = "__all__"
-    
+        fields = ["id", "username", "email", "password", "password2"]  
+
     def validate(self, data):
         if data["password"] != data["password2"]:
             raise serializers.ValidationError("Passwords do not match.")
         return data
 
     def create(self, validated_data):
+        validated_data.pop("password2") 
         user = User.objects.create(
-            username=validated_data["email"]
+            username=validated_data["username"],  
+            email=validated_data.get("email", "")  
         )
-        
-        user.set_password(validated_data["password"])
+        user.set_password(validated_data["password"])  
         user.save()
-        
         return user
 
 class UserViewSet(viewsets.ModelViewSet):
