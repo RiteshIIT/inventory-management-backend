@@ -153,12 +153,6 @@ class ProductDetail(APIView):
             product = Inventory.objects.get(pk=pk, owner=user)  
         except Inventory.DoesNotExist:
             return Response({"error": "Product not found."}, status=404)
-
-        
-        provided_code = data.get("code")
-        if not provided_code or product.code != provided_code:
-            return Response({"error": "Incorrect or missing product code."}, status=400)
-
         
         updated_fields = []
         if "name" in data:
@@ -170,6 +164,9 @@ class ProductDetail(APIView):
         if "quantity" in data:
             product.quantity = data["quantity"]
             updated_fields.append("quantity")
+        if "price" in data:
+            product.price = data["price"]
+            updated_fields.append("price")
 
         if not updated_fields:
             return Response({"error": "No valid fields to update."}, status=400)
@@ -189,7 +186,6 @@ class ProductDetail(APIView):
             return Response({"error": "Product not found."}, status=404)
         product.delete()
         return Response(status=204)
-    
 class ProductList(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
